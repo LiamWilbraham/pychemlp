@@ -112,12 +112,16 @@ class MLP:
             self.y_train= self.y
 
 
-    def build_network(self, activation='relu'):
+    def build_network(self, activation='relu', dropout=None):
         '''Prepare neural network graph
 
         Arguments:
             activation (`str`, optional):
                 Activation function to use for all layers. Defaults to 'relu'.
+
+            dropout (`float`, optional):
+                Dropout fraction to be applied to all hidden layers. Defaults
+                to `None`, where no dropout is applied.
         '''
 
         if activation == 'relu':
@@ -128,7 +132,9 @@ class MLP:
         network = []
         for i in range(0, len(self.layers)):
                 network.append(tf.keras.layers.Dense(self.layers[i], activation=act))
-        network.append(tf.keras.layers.Dense(self.n_output, activation=act))
+                if dropout is not None:
+                    network.append(tf.keras.layers.Dropout(dropout))
+        network.append(tf.keras.layers.Dednse(self.n_output, activation=act))
         self.model = tf.keras.Sequential(network)
 
 
@@ -161,8 +167,9 @@ class MLP:
 
         '''
         tf.keras.backend.clear_session()
-        self.model.compile(optimizer=optimizer,loss=loss)
+        self.model.compile(optimizer=optimizer, loss=loss)
         self.model.fit(self.x_train, self.y_train, epochs=epochs)
+        #self.model.summary()
 
 
     def evaluate(self):
@@ -179,7 +186,7 @@ class MLP:
 
         pred = self.model.predict(self.x_test)
         mae = np.mean(np.abs(self.y_test - pred))
-        rmse = np.sqrt(np.mean(self.y_test - pred)**2)
+        rmse = np.sqrt(np.mean(((self.y_test - pred)**2)))
 
         string = '\nModel Evaluation\n'
         string += '----------------\n'
