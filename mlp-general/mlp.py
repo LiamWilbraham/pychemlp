@@ -134,7 +134,7 @@ class MLP:
                 network.append(tf.keras.layers.Dense(self.layers[i], activation=act))
                 if dropout is not None:
                     network.append(tf.keras.layers.Dropout(dropout))
-        network.append(tf.keras.layers.Dednse(self.n_output, activation=act))
+        network.append(tf.keras.layers.Dense(self.n_output, activation=act))
         self.model = tf.keras.Sequential(network)
 
 
