@@ -57,12 +57,13 @@ class MLP:
                   filepath,
                   smiles_col,
                   y_cols,
-                  sep=' '):
+                  sep=' ',
+                  from_pkl=False):
         '''Load training data from .csv files
 
         Arguments:
             filepath (`str`):
-                Path to .csv file containing training data
+                Path to file containing training data
 
             smiles_col (`str`):
                 Column name containing SMILES strings
@@ -72,9 +73,17 @@ class MLP:
 
             sep (`str`, optional):
                 Separator used in .csv file. Defaults to ' '.
+
+            from_pkl (`bool`, optional):
+                Load data from pickled object. Defaults to False.
         '''
 
-        data = pd.read_csv(filepath, sep=sep)#.head(2000) ####### remove head eventually
+        if from_pkl:
+            data = pd.read_pkl(filepath)
+
+        else:
+            data = pd.read_csv(filepath, sep=sep)#.head(2000) ####### remove head eventually
+
         self.smiles = data[smiles_col]
         self.y = np.column_stack((data[y].values for y in y_cols))
 
@@ -101,6 +110,7 @@ class MLP:
             fp = AllChem.GetMorganFingerprintAsBitVect(mol, rad, nBits=bits)
             return np.array(fp)
 
+        self.n_input = bits
         x = np.zeros((len(self.smiles), bits))
         for index, smi in enumerate(self.smiles):
             x[index] = morgan(smi, rad, bits)
@@ -112,7 +122,7 @@ class MLP:
             self.y_train= self.y
 
 
-    def build_network(self, activation='relu', dropout=None):
+    def build_network(self, activation='relu', dropout=None, input_dropout=None):
         '''Prepare neural network graph
 
         Arguments:
@@ -123,6 +133,7 @@ class MLP:
                 Dropout fraction to be applied to all hidden layers. Defaults
                 to `None`, where no dropout is applied.
         '''
+        tf.keras.backend.clear_session()
 
         if activation == 'relu':
             act = tf.nn.relu
@@ -130,6 +141,8 @@ class MLP:
             act = tf.nn.linear
 
         network = []
+        if input_dropout is not None:
+            network.append(tf.keras.layers.Dropout(input_dropout))
         for i in range(0, len(self.layers)):
                 network.append(tf.keras.layers.Dense(self.layers[i], activation=act))
                 if dropout is not None:
@@ -166,10 +179,9 @@ class MLP:
                 (stochastic gradient descent).
 
         '''
-        tf.keras.backend.clear_session()
         self.model.compile(optimizer=optimizer, loss=loss)
         self.model.fit(self.x_train, self.y_train, epochs=epochs)
-        #self.model.summary()
+        self.model.summary()
 
 
     def evaluate(self):
