@@ -132,6 +132,10 @@ class MLP:
             dropout (`float`, optional):
                 Dropout fraction to be applied to all hidden layers. Defaults
                 to `None`, where no dropout is applied.
+
+            input_dropout (`float`, optional):
+                Dropout fraction to be applied to the input layer. Defaults
+                to `None`, where no dropout is applied.
         '''
         tf.keras.backend.clear_session()
 
