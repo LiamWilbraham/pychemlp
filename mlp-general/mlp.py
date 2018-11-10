@@ -6,7 +6,6 @@ from rdkit.Chem import AllChem
 from sklearn.model_selection import train_test_split
 
 class MLP:
-
     '''Class to construct, train and evaluate Multylayer Perceptrons.
 
     Simple neural networks can be constructed, trained and evaluated to
@@ -35,7 +34,6 @@ class MLP:
                  n_output,
                  layers,
                  ):
-
         ''' Specify the general neural network architecture
 
         Arguments:
@@ -161,7 +159,6 @@ class MLP:
               batch_size=50,
               loss='mean_absolute_error',
               optimizer='sgd'):
-
         '''Train neural network
 
          Arguments:
