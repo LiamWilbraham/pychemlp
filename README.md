@@ -2,7 +2,6 @@
 Easy-to-use python module for the training of Multi-Layer Perceptrons (neural networks) from molecular SMILES data and known associated properties.
 
 ## Functionality
-Within the module, the user can:
 
 * import data from external .csv files and pickled objects
 * generate molecular fingerprints based on the Extended Connectivity Fingerprint (ECFP) method
