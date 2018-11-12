@@ -70,7 +70,7 @@ class MLP:
         '''
 
         if from_pkl:
-            self.data = pd.read_pickle(filepath)
+            self.data = pd.read_pickle(filepath).head(1000)
 
         else:
             self.data = pd.read_csv(filepath, sep=sep)
