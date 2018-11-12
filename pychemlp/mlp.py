@@ -287,8 +287,9 @@ class MLP:
             if mse < mse_best:
                 mse_best = mse
                 p_best = p
-                self.best_model = self.model
+                best_model = self.model
 
+        self.model = best_model
         string = '\nBest Model, RMSE = {:.4f}\n'.format(mse_best)
         string += '-----------------------\n'
         for key, value in p_best.items():
