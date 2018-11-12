@@ -70,7 +70,7 @@ class MLP:
         '''
 
         if from_pkl:
-            self.data = pd.read_pickle(filepath).head(1000)
+            self.data = pd.read_pickle(filepath)
 
         else:
             self.data = pd.read_csv(filepath, sep=sep)
@@ -232,11 +232,12 @@ class MLP:
         '''Optimize hyperparameters via a random search
 
         search_space (`dict`):
-            Dictionary specifying the search space. Keys are the hyperparameters
-            to be optimized and values are lists of allowed hyperparameter
-            values. Allowed hyperparameters to be otimised are 'n_layers',
-            'n_neurons', 'dropout', 'input_dropout', 'activation', 'batch_size',
-            'optimizer', 'loss', 'learning_rate' & 'decay'.
+            Dictionary specifying the search space. Keys are the
+            hyperparameters to be optimized and values are lists of
+            allowed hyperparameter values. Allowed hyperparameters to be
+            optimised are 'n_layers', 'n_neurons', 'dropout',
+            'input_dropout', 'activation', 'batch_size', 'optimizer',
+            'loss', 'learning_rate' & 'decay'.
 
         iterations (`int`):
             Number of iterations of random search to be performed.
@@ -255,7 +256,7 @@ class MLP:
              'optimizer': 'adam',
              'loss': 'mean_absolute_error',
              'learning_rate': 0.01,
-             'decay': 0.00,}
+             'decay': 0.00}
 
         mse_best = 10**10
         for i in range(iterations):
@@ -279,7 +280,9 @@ class MLP:
 
             y, pred, mae, mse = self.evaluate(silent=True)
 
-            print('Iteration : {:03}, RMSE: {:.4f}'.format(i, mse))
+            output = 'Iteration : {:03}, RMSE: {:.4f}\n'.format(i, mse)
+            output += ''.join(['{} : {} \n'.format(key, value) for key, value in p.items()])
+            print(output)
 
             if mse < mse_best:
                 mse_best = mse
@@ -289,5 +292,5 @@ class MLP:
         string = '\nBest Model, RMSE = {:.4f}\n'.format(mse_best)
         string += '-----------------------\n'
         for key, value in p_best.items():
-            string += ('{} : {}\n'.format(key, value))
+            string += ('{} : {} '.format(key, value))
         print(string)
