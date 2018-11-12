@@ -14,6 +14,7 @@ Easy-to-use python module for the training of Multi-Layer Perceptrons (neural ne
 ### Simple construction and training of a neural network
 ```python
 from pychemlp import MLP
+
 nn = MLP()
 nn.load_data('example_data.pkl', 'TRIMER', ['IP (eV)', 'EA (eV)', 'Excitation Energy (eV)'], from_pkl=True)
 nn.fingerprint(bits=2048, rad=2, test_frac=0.3)
@@ -23,6 +24,8 @@ y, pred, mae, rmse = nn.evaluate()
 ```
 ### Hyperpearameter optimization using a random search
 ```python
+from pychemlp import MLP
+
 search_space = {'dropout': [0.1, 0.2, 0.3, 0.4, 0.5],
                 'input_dropout': [0.1, 0.2, 0.3, 0.4, 0.5],
                 'n_layers': [1, 2, 3, 4],
