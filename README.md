@@ -1,4 +1,4 @@
-# mlp-general
+# PyCheMLP
 Easy-to-use python module for the training of Multi-Layer Perceptrons (neural networks) from molecular SMILES data and known associated properties.
 
 ## Functionality
