@@ -1,3 +1,4 @@
+import random
 import tensorflow as tf
 import pandas as pd
 import numpy as np
@@ -28,28 +29,18 @@ class MLP:
         evaluate:
             Evaluate neural network performance on test data group.
 
+        hyperparam_opt_random:
+            Optimize hyperparameters via a random search.
+
     '''
 
-    def __init__(self,
-                 n_output,
-                 layers,
-                 ):
+    def __init__(self, name='mlp'):
         ''' Specify the general neural network architecture
 
         Arguments:
-            n_output (`int`)
-                Output dimension of the neural network. This should be equal
-                to the number of properties to be predicted simultaneously.
-
-            layers (`list` of `int`)
-                A list of integers with length equal to the number of hidden
-                layers required. Integer values are the number of neurons
-                within a given layer.
+            name (`str`, optional)
+                Give a name to the MLP class instance.
         '''
-
-        self.n_output = n_output
-        self.layers = layers
-
 
     def load_data(self,
                   filepath,
@@ -77,14 +68,14 @@ class MLP:
         '''
 
         if from_pkl:
-            data = pd.read_pkl(filepath)
+            self.data = pd.read_pickle(filepath)
 
         else:
-            data = pd.read_csv(filepath, sep=sep)#.head(2000) ####### remove head eventually
+            self.data = pd.read_csv(filepath, sep=sep).head(5000) ####### remove head eventually
 
-        self.smiles = data[smiles_col]
-        self.y = np.column_stack((data[y].values for y in y_cols))
-
+        self.smiles = self.data[smiles_col]
+        self.y = np.column_stack((self.data[y].values for y in y_cols))
+        self.n_output = len(y_cols)
 
     def fingerprint(self, bits=512, rad=2, test_frac=None):
         '''Fingerprint molecules from SMILES strings
@@ -108,7 +99,6 @@ class MLP:
             fp = AllChem.GetMorganFingerprintAsBitVect(mol, rad, nBits=bits)
             return np.array(fp)
 
-        self.n_input = bits
         x = np.zeros((len(self.smiles), bits))
         for index, smi in enumerate(self.smiles):
             x[index] = morgan(smi, rad, bits)
@@ -120,10 +110,16 @@ class MLP:
             self.y_train= self.y
 
 
-    def build_network(self, activation='relu', dropout=None, input_dropout=None):
+    def build_network(self, n_layers, n_neurons, activation='relu', dropout=None, input_dropout=None):
         '''Prepare neural network graph
 
         Arguments:
+            n_layers (`int`):
+                Number of hidden layers.
+
+            n_neurons (`int`):
+                Number of neurons per hidden layer.
+
             activation (`str`, optional):
                 Activation function to use for all layers. Defaults to 'relu'.
 
@@ -145,8 +141,8 @@ class MLP:
         network = []
         if input_dropout is not None:
             network.append(tf.keras.layers.Dropout(input_dropout))
-        for i in range(0, len(self.layers)):
-                network.append(tf.keras.layers.Dense(self.layers[i], activation=act))
+        for i in range(0, n_layers):
+                network.append(tf.keras.layers.Dense(n_neurons, activation=act))
                 if dropout is not None:
                     network.append(tf.keras.layers.Dropout(dropout))
         network.append(tf.keras.layers.Dense(self.n_output, activation=act))
@@ -154,17 +150,16 @@ class MLP:
 
 
     def train(self,
-              learning_rate=0.01,
               epochs=10,
               batch_size=50,
               loss='mean_absolute_error',
-              optimizer='sgd'):
+              optimizer='adam',
+              learning_rate=0.001,
+              decay=0.0,
+              validation_split=0.0):
         '''Train neural network
 
          Arguments:
-             learning_rate (`float`, optional):
-                Learning rate. Defaults to 0.01.
-
              epochs (`int`, optional):
                 Number of training epochs. Defaults to 10.
 
@@ -179,13 +174,26 @@ class MLP:
                 Optimizer to be used in training. Defaults to 'sgd'
                 (stochastic gradient descent).
 
+             learning_rate (`float`, optional):
+                Learning rate to be used by the optimizer. Defaults to
+                `0.001`.
+
+             decay (`float`, optional):
+                Learning rate decay over each update used by the optimizer.
+                Defaults to '0.0'
         '''
+        if optimizer == 'sgd':
+            optimizer = tf.keras.optimizers.SGD(lr=learning_rate, decay=decay)
+        elif optimizer == 'adam':
+            optimizer = tf.keras.optimizers.Adam(lr=learning_rate, decay=decay)
+
         self.model.compile(optimizer=optimizer, loss=loss)
-        self.model.fit(self.x_train, self.y_train, epochs=epochs)
-        self.model.summary()
+        self.model.fit(self.x_train, self.y_train, epochs=epochs,
+                        validation_split=validation_split, verbose=0)
+        #self.model.summary()
 
 
-    def evaluate(self):
+    def evaluate(self, silent=False):
         '''Evaluate model performance against test data
 
         Returns:
@@ -205,6 +213,75 @@ class MLP:
         string += '----------------\n'
         string += 'Mean Absolute Error: {:.4}\n'.format(mae)
         string += 'RMS Error : {:.4}\n'.format(rmse)
-        print(string)
 
-        return self.y_test, pred
+        if not silent:
+            print(string)
+
+        return self.y_test, pred, mae, rmse
+
+
+    def hyperparam_opt_random(self, search_space, iterations, epochs=10):
+        '''Optimize hyperparameters via a random search
+
+        search_space (`dict`):
+            Dictionary specifying the search space. Keys are the hyperparameters
+            to be optimized and values are lists of allowed hyperparameter
+            values. Allowed hyperparameters to be otimised are 'n_layers',
+            'n_neurons', 'dropout', 'input_dropout', 'activation', 'batch_size',
+            'optimizer', 'loss', 'learning_rate' & 'decay'.
+
+        iterations (`int`):
+            Number of iterations of random search to be performed.
+
+        epochs (`int`, optional):
+            Number of epochs to be used in training during each iteration
+            of the random search.
+        '''
+
+        p = {
+            'n_layers': 2,
+            'n_neurons': 256,
+            'dropout': 0.0,
+            'input_dropout': 0.0,
+            'activation': 'relu',
+            'batch_size': 32,
+            'optimizer': 'adam',
+            'loss': 'mean_absolute_error',
+            'learning_rate': 0.01,
+            'decay': 0.00,
+           }
+
+        mse_best = 10**10
+        for i in range(iterations):
+            for key, value in search_space.items():
+                random_value = random.choice(value)
+                p[key] = random_value
+
+            self.build_network(n_layers=p['n_layers'],
+                               n_neurons=p['n_neurons'],
+                               dropout=p['dropout'],
+                               input_dropout=p['input_dropout'],
+                               activation=p['activation'])
+
+            self.train(epochs=epochs,
+                       batch_size=p['batch_size'],
+                       optimizer=p['optimizer'],
+                       loss=p['loss'],
+                       learning_rate=p['learning_rate'],
+                       decay=p['decay'],
+                       )
+
+            y, pred, mae, mse = self.evaluate(silent=True)
+
+            print('Iteration : {:03}, RMSE: {:.4f}'.format(i, mse))
+
+            if mse < mse_best:
+                mse_best = mse
+                p_best = p
+                self.best_model = self.model
+
+        string = '\nBest Model, RMSE = {:.4f}\n'.format(mse_best)
+        string += '-----------------------\n'
+        for key, value in p_best.items():
+            string += ('{} : {}\n'.format(key, value))
+        print(string)
