@@ -30,7 +30,7 @@ class MLP:
             Evaluate neural network performance on test data group.
 
         hyperparam_opt_random:
-            Optimize hyperparameters via a random search.
+            Optimize hyperparameters using a random search strategy.
 
     '''
 
@@ -41,6 +41,8 @@ class MLP:
             name (`str`, optional)
                 Give a name to the MLP class instance.
         '''
+        self.name = name
+
 
     def load_data(self,
                   filepath,
@@ -71,11 +73,12 @@ class MLP:
             self.data = pd.read_pickle(filepath)
 
         else:
-            self.data = pd.read_csv(filepath, sep=sep).head(5000) ####### remove head eventually
+            self.data = pd.read_csv(filepath, sep=sep)
 
         self.smiles = self.data[smiles_col]
         self.y = np.column_stack((self.data[y].values for y in y_cols))
         self.n_output = len(y_cols)
+
 
     def fingerprint(self, bits=512, rad=2, test_frac=None):
         '''Fingerprint molecules from SMILES strings
@@ -110,7 +113,12 @@ class MLP:
             self.y_train= self.y
 
 
-    def build_network(self, n_layers, n_neurons, activation='relu', dropout=None, input_dropout=None):
+    def build_network(self,
+                      n_layers,
+                      n_neurons,
+                      activation='relu',
+                      dropout=None,
+                      input_dropout=None):
         '''Prepare neural network graph
 
         Arguments:
@@ -238,18 +246,16 @@ class MLP:
             of the random search.
         '''
 
-        p = {
-            'n_layers': 2,
-            'n_neurons': 256,
-            'dropout': 0.0,
-            'input_dropout': 0.0,
-            'activation': 'relu',
-            'batch_size': 32,
-            'optimizer': 'adam',
-            'loss': 'mean_absolute_error',
-            'learning_rate': 0.01,
-            'decay': 0.00,
-           }
+        p = {'n_layers': 2,
+             'n_neurons': 256,
+             'dropout': 0.0,
+             'input_dropout': 0.0,
+             'activation': 'relu',
+             'batch_size': 32,
+             'optimizer': 'adam',
+             'loss': 'mean_absolute_error',
+             'learning_rate': 0.01,
+             'decay': 0.00,}
 
         mse_best = 10**10
         for i in range(iterations):
