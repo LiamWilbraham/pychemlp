@@ -197,7 +197,7 @@ class MLP:
 
         self.model.compile(optimizer=optimizer, loss=loss)
         self.model.fit(self.x_train, self.y_train, epochs=epochs,
-                        validation_split=validation_split, verbose=0)
+                        validation_split=validation_split, verbose=1)
         #self.model.summary()
 
 
@@ -210,6 +210,12 @@ class MLP:
 
             pred (`array`):
                 Model's prediction of target data.
+
+            mae (`float`):
+                Model test mean absolute error.
+
+            rmse (`float`):
+                Model test root mean squared error.
 
         '''
 
