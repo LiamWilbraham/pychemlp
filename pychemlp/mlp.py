@@ -293,5 +293,5 @@ class MLP:
         string = '\nBest Model, RMSE = {:.4f}\n'.format(mse_best)
         string += '-----------------------\n'
         for key, value in p_best.items():
-            string += ('{} : {} '.format(key, value))
+            string += ('{} : {} \n'.format(key, value))
         print(string)
