@@ -22,6 +22,8 @@ nn.build_network(2, 256, dropout=0.5, activation='relu', input_dropout=0.5)
 nn.train(epochs=10, batch_size=50, loss='mean_absolute_error)
 y, pred, mae, rmse = nn.evaluate()
 ```
+Where `'SMILES'` is the name of the data column containing SMILES data and `['PROP1', 'PROP2', 'PROP3']` is a list of columns which contain the training target data (in this case, the model will be trained to predict three different properties). 
+
 ### Hyperpearameter optimization using a random search
 ```python
 from pychemlp import MLP
@@ -38,8 +40,6 @@ search_space = {'dropout': [0.1, 0.2, 0.3, 0.4, 0.5],
                 'batch_size': [32, 64, 128, 256]}
 nn.hyperparam_opt_random(search_space, 20, epochs=20)
 ```
-Where `'SMILES'` is the name of the data column containing SMILES data and `['PROP1', 'PROP2', 'PROP3']` is a list of columns which contain the training target data (in this case, the model will be trained to predict three different properties). 
-
 ### Using a trained model
 Once trained a model can be called as an attribute of the MLP class to make new predictions:
 ```python
