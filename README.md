@@ -1,4 +1,4 @@
-# chemlp
+# pychemlp
 Easy-to-use python module for the training of Multi-Layer Perceptrons (neural networks) from molecular SMILES data and known associated properties.
 
 This code was developed while doing my post-doc in the Zwijnenburg group, https://www.zwijnenburg-group.org/.
