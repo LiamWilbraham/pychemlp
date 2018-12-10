@@ -8,6 +8,6 @@ search_space = {'dropout': [0.1, 0.2, 0.3, 0.4, 0.5],
                 'batch_size': [32, 64, 128, 256]}
 
 nn = MLP()
-nn.load_data('./example_data.pkl', 'TRIMER', ['IP (eV)', 'EA (eV)', 'Excitation Energy (eV)'], from_pkl=True)
-nn.fingerprint(bits=2048, rad=2, test_frac=0.3)
-nn.hyperparam_opt_random(search_space, 20, epochs=20)
+nn.load_data('training-data.pkl', 'TRIMER', ['Calib. IP (eV)', 'Calib. EA (eV)', 'Calib. Excitation Energy (eV)'])
+nn.fingerprint(bits=2048, rad=2, test_frac=0.5)
+nn.hyperparam_opt_random(search_space, 100, epochs=20)
