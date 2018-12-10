@@ -18,7 +18,7 @@ This code was developed while doing my post-doc in the Zwijnenburg group, https:
 from pychemlp import MLP
 
 nn = MLP()
-nn.load_data('example_data.pkl', 'SMILES', ['PROP1, 'PROP2', 'PROP3'], from_pkl=True)
+nn.load_data('training_data.csv', 'SMILES', ['PROP1, 'PROP2', 'PROP3'])
 nn.fingerprint(bits=2048, rad=2, test_frac=0.3)
 nn.build_network(2, 256, dropout=0.5, activation='relu', input_dropout=0.5)
 nn.train(epochs=10, batch_size=50, loss='mean_absolute_error)
@@ -51,10 +51,11 @@ Where fingerprint_array is an array of (Morgan) fingerprints which can be obtain
 
 ## Installation & Requirements
 
-To install, simply clone the repo:
+To install, simply clone the repository:
 ```
 git clone https://github.com/LiamWilbraham/pychemlp.git
 ```
+and add the location of the pychemlp repository to your PYTHONPATH.
 
 The module requires the following packages (all can be installed via conda):
 
