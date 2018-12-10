@@ -5,8 +5,8 @@ This code was developed while doing my post-doc in the Zwijnenburg group, https:
 
 ## Functionality
 
-* import data from external .csv files and pickled objects
-* generate molecular fingerprints based on the Extended Connectivity Fingerprint (ECFP) method
+* Import data from external .csv files and pickled objects
+* Generate molecular fingerprints based on the Extended Connectivity Fingerprint (ECFP) method
 * Specify neural network architectures (number of layers, neurons per layer, dropout)
 * Train and evaluate models
 * Conduct hyperparameter optimization using a random search
