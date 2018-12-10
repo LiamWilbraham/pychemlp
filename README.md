@@ -18,7 +18,7 @@ This code was developed while doing my post-doc in the Zwijnenburg group, https:
 from pychemlp import MLP
 
 nn = MLP()
-nn.load_data('training_data.csv', 'SMILES', ['PROP1, 'PROP2', 'PROP3'])
+nn.load_data('training_data.csv', 'SMILES', ['PROP1', 'PROP2', 'PROP3'])
 nn.fingerprint(bits=2048, rad=2, test_frac=0.3)
 nn.build_network(2, 256, dropout=0.5, activation='relu', input_dropout=0.5)
 nn.train(epochs=10, batch_size=50, loss='mean_absolute_error)
