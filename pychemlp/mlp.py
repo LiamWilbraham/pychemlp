@@ -80,6 +80,26 @@ class MLP:
         self.n_output = len(y_cols)
 
 
+    def load_model(self, path):
+        '''Load a model from an HDF5 file (*.h5)
+
+        Arguments:
+            path (`str`):
+                Path to HDF5 file containing pre-trained model
+        '''
+        self.model = tf.keras.models.load_model(path, compile=False)
+
+
+    def save_model(self, path):
+        '''Save a model to an HDF5 file (*.h5)
+
+        Arguments:
+            path (`str`):
+                Path to location where HDF5 file is to be saved
+        '''
+        tf.keras.models.save_model(self.model, path)
+
+
     def fingerprint(self, bits=512, rad=2, test_frac=None):
         '''Fingerprint molecules from SMILES strings
 
