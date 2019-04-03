@@ -49,6 +49,14 @@ predictions = nn.model.predict(fingerprint_array)
 ```
 Where fingerprint_array is an array of (Morgan) fingerprints which can be obtained by calling `load_data` and `fingerprint`, using a file containing SMILES for which predictions are to be made.
 
+### Loading and saving models
+Existing models can be loaded or trained model saved
+```python 
+nn.load_model(path)
+nn.save_model(path)
+```
+Where `path` is the path and filename of the save/load location. Models should be saved to/loaded form HDF5 format.
+
 ## Installation & Requirements
 
 To install, simply clone the repository:
