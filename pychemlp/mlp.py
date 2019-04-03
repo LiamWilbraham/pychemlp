@@ -48,7 +48,7 @@ class MLP:
                   filepath,
                   smiles_col,
                   y_cols,
-                  sep=' ',
+                  sep=',',
                   from_pkl=False):
         '''Load training data from .csv files
 
